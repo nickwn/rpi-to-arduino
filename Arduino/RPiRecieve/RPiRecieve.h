@@ -1,6 +1,7 @@
 #ifndef RPI_RECIEVE_H
 #define RPI_RECIEVE_H
 
+
 void rpiInit();
 
 bool rpiRead();

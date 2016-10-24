@@ -1,7 +1,7 @@
 #include "RPiRecieve.h"
-#include <Arduino.h>
+#include "Arduino.h"
 
-int distance = -1, azimuth = -1, altitude = -1;
+double distance = -1, azimuth = -1, altitude = -1;
 
 void rpiInit()
 {
@@ -10,9 +10,13 @@ void rpiInit()
 
 bool rpiRead()
 {
-  if(Serial.available() < 4) return false;
+  while ((char)Serial.read() != ';')
+  {
+	  if(Serial.available() <= 0)
+		  return false;
+  }
+  if(Serial.available() <3) return false;
 
-  while ((char)Serial.read() != ';');
   distance = Serial.read();
   azimuth = Serial.read();
   altitude = Serial.read();
