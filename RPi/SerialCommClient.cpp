@@ -1,11 +1,12 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cstdlib>
+#include <cstring>
 #include <getopt.h>
 #include <boost/asio.hpp>
+#include <thread>
 #include "rs232.h"
-
-#define _WIN32_WINDOWS
 
 using boost::asio::ip::tcp;
 
@@ -20,11 +21,11 @@ static struct option long_options[] =
 
 int main (int argc, char* argv[])
 {
-  char* host = nullptr;
-  char* port = nullptr;
+  const char* host = "";
+  const char* port = "";
   int serial = -1;
 
-  std::string usage = "Usage: \n" + std::string(argv[0]) + " -host <host> -port <port> -serial <serial>";
+  std::string usage = "Usage: \n" + std::string(argv[0]) + " --host <host> --port <port> --serial <serial>";
   int c = 0;
   int option_index = 0;
   while((c = getopt_long(argc, argv, "h:p:s:", long_options, &option_index)) != -1)
@@ -38,7 +39,7 @@ int main (int argc, char* argv[])
       port = optarg;
       break;
     case 's':
-      serial = atoi(optarg);
+      serial = std::atoi(optarg);
       break;
     case '?':
       return -1;
@@ -47,18 +48,22 @@ int main (int argc, char* argv[])
     }
   }
 
-  if(host == nullptr || port == nullptr || serial == -1)
+  if(host == "" || port == "" || serial == -1)
   {
     std::cerr << usage << std::endl;
   }
+
+  /*
+  std::cout << "Opening serial port " << serial << "..." << std::endl;
 
   char mode[]={'8','N','1',0};
   int bdrate = 9600;
   if(RS232_OpenComport(serial, bdrate, mode))
   {
-    std::cerr << "Could not open port " + serial << std::endl;
+    std::cerr << "Could not open port " << serial << std::endl;
     return -1;
   }
+  */
 
   try
   {
@@ -69,21 +74,31 @@ int main (int argc, char* argv[])
 
     while(true)
     {
+      boost::asio::streambuf buffer;
+      boost::asio::read_until(s, buffer, '\n');
+      std::istream str(&buffer);
       std::string in;
-      boost::asio::read(s, boost::asio::buffer(in, 256));
+      std::getline(str, in);
+      std::cout << "Recieved message: " << in << std::endl;
 
-      size_t pos;
-      const char* split[4];
-      for(int i = 0; (pos=in.find(";")) != std::string::npos; i++)
+      std::vector<std::string> split;
+      std::stringstream ss(in);
+      std::string tok;
+      while(getline(ss, tok, ';'))
       {
-        split[i] = in.substr(0, pos).c_str();
-        in = in.substr(pos+1);
+        split.push_back(tok);
       }
+
 
       if(split[0] == "true")
       {
-        std::string msg = ";" + (char) atoi(split[1]) + (char) atoi(split[2]) + (char) atoi(split[3]);
-        RS232_cputs(serial, msg.c_str());
+        std::cout << "Found target" << std::endl;
+        char dist = (char) std::atoi(split[1].c_str());
+        char azimuth = (char) std::atoi(split[2].c_str());
+        char altitude = (char) std::atoi(split[3].c_str());
+        std::string msg({';', dist, azimuth, altitude});
+        std::cout << "Sending message: " << msg << std::endl;
+        //RS232_cputs(serial, msg.c_str());
       }
     }
   }
