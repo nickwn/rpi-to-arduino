@@ -53,7 +53,7 @@ int main (int argc, char* argv[])
     std::cerr << usage << std::endl;
   }
 
-  /*
+
   std::cout << "Opening serial port " << serial << "..." << std::endl;
 
   char mode[]={'8','N','1',0};
@@ -63,7 +63,7 @@ int main (int argc, char* argv[])
     std::cerr << "Could not open port " << serial << std::endl;
     return -1;
   }
-  */
+
 
   try
   {
@@ -98,7 +98,6 @@ int main (int argc, char* argv[])
         char altitude = (char) std::atoi(split[3].c_str());
         std::string msg({';', dist, azimuth, altitude});
         std::cout << "Sending message: " << msg << std::endl;
-        //RS232_cputs(serial, msg.c_str());
       }
     }
   }
