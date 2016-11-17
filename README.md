@@ -50,7 +50,7 @@ void loop()
 The Raspberry Pi side is much easier. 
 
 
-In order to communicate with the RoboRIO, WPILib has created a NetworkTables library in java. However, CV's targeting code is in C++. In order to get around this, CV has the C++ targeting code and the Java NetworkTables code communicate through a server-socket connection. Note: the server-socket connection is different from the NetworkTable. The server-socket connection allows the C++ targeting code and Java code to communicate (albeit on the same device, the Raspberry Pi). The NetworkTables code allows the Java code and the RoboRIO to communicate.
+In order to communicate with the RoboRIO, WPILib has created a NetworkTables library in java. However, CV's targeting code is in C++. In order to get around this, CV has the C++ targeting code and the Java NetworkTables code communicate through a server-client connection. Note: the server-client connection is different from the NetworkTable. The server-client connection allows the C++ targeting code and Java code to communicate (albeit on the same device, the Raspberry Pi). The NetworkTables code allows the Java code and the RoboRIO to communicate.
 
 
 The code in RPi side of this repository acts as a network client. Instead of having the targeting code communicate with the Java client, the targeting code can communicate with this client, which will send the information to the Arduino. All you have to do is run the targeting server, then run the client:
@@ -62,7 +62,7 @@ The code in RPi side of this repository acts as a network client. Instead of hav
 ```--host``` The host server for the client to connect to. This would normally be an ip address, but since the client and server are on the same device, we can use the shortcut ```localhost```.
 
 
-```--port`` The port to connect to. This is normally port 3341 (get it?)
+```--port``` The port to connect to. This is normally port 3341 (get it?)
 
 
 ```--serial``` The serial port number the Arduino is at. To figure this out, open the Arduino IDE and find the serial port. It should look something like /dev/tty123 on linux or COM123 on windows. Then go to http://www.teuniz.net/RS-232/ and scroll to the part where a list of all serial ports is given. Find the number matching your serial port and type it in for this argument.
