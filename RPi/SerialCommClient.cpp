@@ -98,6 +98,7 @@ int main (int argc, char* argv[])
         char altitude = (char) std::atoi(split[3].c_str());
         std::string msg({';', dist, azimuth, altitude});
         std::cout << "Sending message: " << msg << std::endl;
+        RS232_cputs(serial, msg.c_str());
       }
     }
   }
